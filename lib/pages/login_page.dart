@@ -86,7 +86,7 @@ class LoginPage extends StatelessWidget {
                 // Sign Up and Forgot Password links
                 TextButton(
                     onPressed: () {
-                      // Navigate to sign up screen
+                      Navigator.pushNamed(context, '/signup');
                     },
                     child: RichText(
                       text: TextSpan(

@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class SignUpPage extends StatelessWidget {
   SignUpPage({super.key});
@@ -8,6 +10,44 @@ class SignUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double h = MediaQuery.of(context).size.height / 932;
     double w = MediaQuery.of(context).size.width / 430;
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final phoneController = TextEditingController();
+    final dobController = TextEditingController();
+    var selectedGender = 'None';
+    void _updateGender(String gender) {
+      selectedGender = gender;
+    }
+
+    Future<void> signUp(BuildContext context, String gender) async {
+      try {
+        // Create user with email and password
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+
+        // Store additional information in Realtime Database
+        DatabaseReference ref =
+            FirebaseDatabase.instance.ref("users/${userCredential.user!.uid}");
+        await ref.set({
+          'phone': phoneController.text,
+          'dob': dobController.text,
+          'gender': gender,
+          // ... [Other fields] ...
+        });
+
+        // Show success message or navigate to another page
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Sign Up Successful')));
+      } on FirebaseAuthException catch (e) {
+        // Handle errors (e.g., email already in use)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+      }
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context)
           .primaryColor, // Set your background color in main.dart
@@ -33,6 +73,7 @@ class SignUpPage extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25 * w),
                   child: TextField(
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       filled: true,
@@ -51,6 +92,7 @@ class SignUpPage extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25 * w),
                   child: TextField(
+                    controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       filled: true,
@@ -69,6 +111,7 @@ class SignUpPage extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25 * w),
                   child: TextField(
+                    controller: phoneController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       filled: true,
@@ -87,8 +130,8 @@ class SignUpPage extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25 * w),
                   child: TextField(
-                    keyboardType: TextInputType.datetime,
-                    obscureText: true,
+                    controller: dobController,
+                    keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
@@ -109,7 +152,8 @@ class SignUpPage extends StatelessWidget {
                           ),
                 ),
                 SizedBox(height: 15 * h),
-                GenderSelectionWidget(w: w, h: h),
+                GenderSelectionWidget(
+                    onGenderChanged: _updateGender, w: w, h: h),
                 SizedBox(height: 20 * h),
                 // Login Button
                 ElevatedButton(
@@ -121,27 +165,7 @@ class SignUpPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        elevation: 6 * h,
-                        behavior: SnackBarBehavior.floating,
-                        content: Container(
-                            alignment: Alignment.center,
-                            height: 20 * h,
-                            child: Text('Sign Up Successful!')),
-                        duration: Duration(
-                            seconds: 1), // Duration before it disappears
-                      ),
-                    );
-
-                    Future.delayed(Duration(seconds: 2), () {
-                      Navigator.pop(context);
-                    });
-                  },
+                  onPressed: () => signUp(context, selectedGender),
                   child: Text('Sign Up',
                       style: TextStyle(
                           color: Theme.of(context).primaryColor,
@@ -161,16 +185,22 @@ class SignUpPage extends StatelessWidget {
 class GenderSelectionWidget extends StatefulWidget {
   final double w;
   final double h;
+  final Function(String) onGenderChanged;
 
-  const GenderSelectionWidget({Key? key, required this.w, required this.h})
-      : super(key: key);
+  GenderSelectionWidget({
+    Key? key,
+    required this.w,
+    required this.h,
+    required this.onGenderChanged,
+  }) : super(key: key);
 
   @override
   _GenderSelectionWidgetState createState() => _GenderSelectionWidgetState();
 }
 
 class _GenderSelectionWidgetState extends State<GenderSelectionWidget> {
-  String selectedGender = 'None'; // Initial value is 'None'
+  // Initial value is 'None'
+  var selectedGender = 'None';
 
   @override
   Widget build(BuildContext context) {
@@ -202,6 +232,7 @@ class _GenderSelectionWidgetState extends State<GenderSelectionWidget> {
       onPressed: () {
         setState(() {
           selectedGender = gender;
+          widget.onGenderChanged(selectedGender);
         });
         // Implement your logic here
       },

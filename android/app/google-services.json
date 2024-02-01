@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "824172618911",
+    "firebase_url": "https://gosustain-61e24-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "gosustain-61e24",
+    "storage_bucket": "gosustain-61e24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824172618911:android:ca8d099b9541b6851aeeaa",
+        "android_client_info": {
+          "package_name": "com.example.gosustain"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwxsUG0K4CIvChCH3C00yW87cL9cpBUm4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

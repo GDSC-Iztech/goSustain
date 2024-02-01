@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:gosustain/pages/login_page.dart';
 import 'package:gosustain/pages/sign_up_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'pages/home_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure flutter bindings are initialized
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  ); // Initialize Firebase
+
   runApp(const MyApp());
 }
 
@@ -28,6 +37,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => LoginPage(),
           '/signup': (context) => SignUpPage(),
+          '/home': (context) => HomePage(),
+          'onUnknownRoute': (context) => LoginPage(),
         });
   }
 }

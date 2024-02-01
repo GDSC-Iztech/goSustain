@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatelessWidget {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  void _login(BuildContext context, String email, String password) async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Login successful, navigate to home page
+      Navigator.pushNamed(context, '/home');
+    } catch (e) {
+      // Handle login error
+      print('Login failed: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double h = MediaQuery.of(context).size.height / 932;
     double w = MediaQuery.of(context).size.width / 430;
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
     return Scaffold(
       backgroundColor: Theme.of(context)
           .primaryColor, // Set your background color in main.dart
@@ -19,10 +38,15 @@ class LoginPage extends StatelessWidget {
                 Text('Login',
                     style: Theme.of(context).primaryTextTheme.displayLarge),
                 SizedBox(height: 20 * h),
-                Image.asset(
-                  'lib/images/image_2-removebg-preview.png',
-                  height: 330 * h,
-                  width: 447 * w,
+                GestureDetector(
+                  onTap: () {
+                    _login(context, "basrihasan6435@gmail.com", "123456");
+                  },
+                  child: Image.asset(
+                    'lib/images/image_2-removebg-preview.png',
+                    height: 330 * h,
+                    width: 447 * w,
+                  ),
                 ),
                 SizedBox(height: 20 * h),
 
@@ -30,6 +54,7 @@ class LoginPage extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25 * w),
                   child: TextField(
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       filled: true,
@@ -48,6 +73,7 @@ class LoginPage extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25 * w),
                   child: TextField(
+                    controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       filled: true,
@@ -73,7 +99,10 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // Implement your login logic
+                    // Navigate to home screen
+
+                    _login(
+                        context, emailController.text, passwordController.text);
                   },
                   child: Text('Login',
                       style: TextStyle(
